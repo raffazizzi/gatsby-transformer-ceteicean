@@ -12,7 +12,7 @@ Supported extensions: `.xml`, `.odd`
 
 ## Install
 
-Coming soon.
+`npm install gatsby-transformer-ceteicean`
 
 **Note:** You also need to have `gatsby-source-filesystem` installed and configured so it points to your files.
 
