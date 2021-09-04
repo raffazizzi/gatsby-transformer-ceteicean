@@ -11,21 +11,24 @@ async function onCreateNode({ node, actions, loadNodeContent, createNodeId, crea
 
     const content = await loadNodeContent(node)
 
-    const xml = new DOMParser().parseFromString(content, 'text/xml')
-
     const defaultNamespaces = {
       "http://www.tei-c.org/ns/1.0": "tei",
       "http://www.tei-c.org/ns/Examples": "teieg"
     }
     const namespaces = options.namespaces || defaultNamespaces
 
-    const transformed = transform(xml, namespaces)
-    const prefixed = new XMLSerializer().serializeToString(transformed.data)
+    const before = options.applyBefore || []
+    const after = options.applyAfter || []
 
-    const obj = {
+    const transformQueue = [...before, transform, ...after]
+    let obj = {
       original: content,
-      prefixed,
-      elements: transformed.elements
+      prefixed: content,
+      elements: []
+    }
+
+    for (const transformation of transformQueue) {
+      obj = await transformation(obj, namespaces)
     }
 
     const id = createNodeId(`${node.id}-CETEI`)
@@ -36,7 +39,7 @@ async function onCreateNode({ node, actions, loadNodeContent, createNodeId, crea
       children: [],
       parent: node.id,
       internal: {
-        content: prefixed,
+        content: obj.prefixed,
         contentDigest: createContentDigest({obj}),
         type: `CETEI`,
       },
@@ -56,7 +59,9 @@ function getAttributeNames(el) {
   return names
 }
 
-function transform(dom, namespaces){
+function transform(obj, namespaces){
+
+  const dom = new DOMParser().parseFromString(obj.original, 'text/xml')
 
   const elements = new Set()
 
@@ -133,8 +138,13 @@ function transform(dom, namespaces){
     return newElement
   }
 
+  const data = convertEl(dom.documentElement)
+
+  const prefixed = new XMLSerializer().serializeToString(data)
+
   return {
-    data: convertEl(dom.documentElement),
+    original: obj.original,
+    prefixed,
     elements: Array.from(elements)
   }
 }
