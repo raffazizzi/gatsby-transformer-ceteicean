@@ -1,6 +1,6 @@
 {
   "name": "gatsby-transformer-ceteicean",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Gastby transformer plugin for TEI XML to CETEIcean Custom Elements",
   "author": "Raff Viglianti <raffaeleviglianti@gmail.com>",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "TEI"
   ],
   "peerDependencies": {
-    "gatsby": "^3.0.0-next.0"
+    "gatsby": "^3.0.0 || ^4.0.0"
   },
   "dependencies": {
     "xmldom": "^0.6.0"
